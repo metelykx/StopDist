@@ -9,7 +9,9 @@ import SwiftUI
 
 struct StartView: View {
     var body: some View {
-        Text("ded")
+        ZStack {
+            Color("background", bundle: nil).ignoresSafeArea()
+        }
     }
 }
 
