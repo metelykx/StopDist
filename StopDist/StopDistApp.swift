@@ -16,11 +16,17 @@ struct StopDistApp: App {
     //to track what to show
     @State var isAppActive: Bool = true
     var body: some Scene {
-        ZStack {
-            
-            
-            WindowGroup {
+        WindowGroup {
+            ZStack {
+                
+                //add Views
                 ContentView()
+                    .opacity(isAppActive ? 1:0)
+                    .animation(.default, value: isAppActive)
+                
+                StartView()
+                    .opacity(isAppActive ? 1:0)
+                    .animation(.default, value: isAppActive)
             }
         }
     }
