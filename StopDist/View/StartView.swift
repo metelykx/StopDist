@@ -11,6 +11,13 @@ struct StartView: View {
     var body: some View {
         ZStack {
             Color("background", bundle: nil).ignoresSafeArea()
+            
+            
+            VStack {
+                Image("emblema", bundle: nil)
+                    .resizable()
+                    .frame(width: 300, height: 300)
+            }
         }
     }
 }
