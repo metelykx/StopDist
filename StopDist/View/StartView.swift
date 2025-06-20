@@ -45,18 +45,15 @@ struct MetelykxView: View {
     
     var body: some View {
 
-            
-            
             VStack {
                 Text("from")
                     .foregroundStyle(.white)
                 
-                
                 Text("metelykx")
                     .foregroundStyle(Color("colorMetelykx"))
-            }
         }
     }
+}
 
 
 #Preview {
