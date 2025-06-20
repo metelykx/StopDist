@@ -25,31 +25,39 @@ struct StartView: View {
                             .frame(width: geometry.size.width * 0.7)
                         
                         Text("StopDist")
-                            .font(.custom("LexendDeca-Regular", size: 40))
+                            .font(.custom("LexendDeca-Regular", size: geometry.size.width * 0.12))
                             .foregroundStyle(.white)
-                            .padding(.top, -45)
-                    }.padding(.bottom, 120)
+                            .padding(.top, geometry.size.height * -(0.05))
+                    }.padding(.bottom, geometry.size.height*0.18)
                     
                     Spacer()
-                    MetelykxView().padding(.bottom, 10)
+                    MetelykxView()
+                        .font(.custom("LexendDeca-Regular", size: geometry.size.width * 0.045))
+                        .padding(.bottom, geometry.size.height * 0.01)
                 }
+                .frame(width: geometry.size.width)
             }
         }
     }
 }
 //-MARK: struct Metelykx
 struct MetelykxView: View {
+    
     var body: some View {
-        VStack {
-            Text("from").font(.custom("LexendDeca-Regular", size: 20))
-                .foregroundStyle(.white)
+
             
             
-            Text("metelykx").font(.custom("LexendDeca-Regular", size: 20))
-                .foregroundStyle(Color("colorMetelykx"))
+            VStack {
+                Text("from")
+                    .foregroundStyle(.white)
+                
+                
+                Text("metelykx")
+                    .foregroundStyle(Color("colorMetelykx"))
+            }
         }
     }
-}
+
 
 #Preview {
     StartView()
