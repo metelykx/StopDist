@@ -16,9 +16,12 @@ struct StopDistApp: App {
     //to track what to show
     @State var isAppActive: Bool = true
     var body: some Scene {
-        
-        WindowGroup {
-            ContentView()
+        ZStack {
+            
+            
+            WindowGroup {
+                ContentView()
+            }
         }
     }
 }
