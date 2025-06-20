@@ -9,7 +9,11 @@ import SwiftUI
 
 @main
 struct StopDistApp: App {
+    
+    @Environment(\.scenePhase) var scenePhase
+    
     var body: some Scene {
+        
         WindowGroup {
             ContentView()
         }
