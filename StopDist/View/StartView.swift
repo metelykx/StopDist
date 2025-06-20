@@ -15,6 +15,7 @@ struct StartView: View {
             
             
             VStack {
+                Spacer()
                 VStack {
                     Image("emblema", bundle: nil)
                         .resizable()
@@ -23,22 +24,26 @@ struct StartView: View {
                     Text("StopDist")
                         .font(.custom("LexendDeca-Regular", size: 40))
                         .foregroundStyle(.white)
-                }
+                        .padding(.top, -45)
+                }.padding(.bottom, 120)
+                
+                Spacer()
+                MetelykxView().padding(.bottom, 10)
             }
         }
     }
 }
 
 //-MARK: struct Metelykx
-struct Metelykx: View {
+struct MetelykxView: View {
     var body: some View {
         VStack {
-            Text("from").font(.custom("LexendDeca-Regular", size: 40))
+            Text("from").font(.custom("LexendDeca-Regular", size: 20))
                 .foregroundStyle(.white)
             
             
-            Text("metelykx").font(.custom("LexendDeca-Regular", size: 40))
-                .foregroundStyle(.white)
+            Text("metelykx").font(.custom("LexendDeca-Regular", size: 20))
+                .foregroundStyle(Color("colorMetelykx"))
         }
     }
 }
