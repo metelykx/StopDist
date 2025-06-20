@@ -13,6 +13,7 @@ struct StopDistApp: App {
     //create variables in order to monitor changes in the lifecycle of the mobile application
     @Environment(\.scenePhase) var scenePhase
     
+    //to track what to show
     @State var isAppActive: Bool = true
     var body: some Scene {
         
