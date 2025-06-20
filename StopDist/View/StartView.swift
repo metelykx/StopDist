@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+//-MARK: struct StartView
 struct StartView: View {
     var body: some View {
         ZStack {
@@ -22,6 +23,20 @@ struct StartView: View {
                     .font(.custom("LexendDeca-Regular", size: 40))
                     .foregroundStyle(.white)
             }
+        }
+    }
+}
+
+//-MARK: struct Metelykx
+struct Metelykx: View {
+    var body: some View {
+        VStack {
+            Text("from").font(.custom("LexendDeca-Regular", size: 40))
+                .foregroundStyle(.white)
+            
+            
+            Text("metelykx").font(.custom("LexendDeca-Regular", size: 40))
+                .foregroundStyle(.white)
         }
     }
 }
