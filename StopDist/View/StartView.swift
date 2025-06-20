@@ -21,7 +21,8 @@ struct StartView: View {
                     VStack {
                         Image("emblema", bundle: nil)
                             .resizable()
-                            .frame(width: 300, height: 300)
+                            .scaledToFit()
+                            .frame(width: geometry.size.width * 0.7)
                         
                         Text("StopDist")
                             .font(.custom("LexendDeca-Regular", size: 40))
