@@ -17,6 +17,10 @@ struct StartView: View {
                 Image("emblema", bundle: nil)
                     .resizable()
                     .frame(width: 300, height: 300)
+                
+                Text("StopDist")
+                    .font(.custom("LexendDeca-Regular", size: 40))
+                    .foregroundStyle(.white)
             }
         }
     }

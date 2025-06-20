@@ -29,9 +29,38 @@
 		CC7BCBB82E054CEA0027FD3A /* StopDistUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StopDistUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CC7BCBD52E055B550027FD3A /* Exceptions for "StopDist" folder in "StopDistTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				kub.ttf,
+			);
+			target = CC7BCBAD2E054CEA0027FD3A /* StopDistTests */;
+		};
+		CC7BCBD62E055B550027FD3A /* Exceptions for "StopDist" folder in "StopDistUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				kub.ttf,
+			);
+			target = CC7BCBB72E054CEA0027FD3A /* StopDistUITests */;
+		};
+		CC7BCBD82E055B7D0027FD3A /* Exceptions for "StopDist" folder in "StopDist" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CC7BCB9D2E054CE70027FD3A /* StopDist */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CC7BCBA02E054CE70027FD3A /* StopDist */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CC7BCBD82E055B7D0027FD3A /* Exceptions for "StopDist" folder in "StopDist" target */,
+				CC7BCBD52E055B550027FD3A /* Exceptions for "StopDist" folder in "StopDistTests" target */,
+				CC7BCBD62E055B550027FD3A /* Exceptions for "StopDist" folder in "StopDistUITests" target */,
+			);
 			path = StopDist;
 			sourceTree = "<group>";
 		};
@@ -398,6 +427,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"StopDist/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StopDist/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -426,6 +456,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"StopDist/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StopDist/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
