@@ -10,30 +10,32 @@ import SwiftUI
 //-MARK: struct StartView
 struct StartView: View {
     var body: some View {
-        ZStack {
-            Color("background", bundle: nil).ignoresSafeArea()
+        GeometryReader { geometry in
             
-            
-            VStack {
-                Spacer()
-                VStack {
-                    Image("emblema", bundle: nil)
-                        .resizable()
-                        .frame(width: 300, height: 300)
-                    
-                    Text("StopDist")
-                        .font(.custom("LexendDeca-Regular", size: 40))
-                        .foregroundStyle(.white)
-                        .padding(.top, -45)
-                }.padding(.bottom, 120)
+            ZStack {
+                Color("background", bundle: nil).ignoresSafeArea()
                 
-                Spacer()
-                MetelykxView().padding(.bottom, 10)
+                
+                VStack {
+                    Spacer()
+                    VStack {
+                        Image("emblema", bundle: nil)
+                            .resizable()
+                            .frame(width: 300, height: 300)
+                        
+                        Text("StopDist")
+                            .font(.custom("LexendDeca-Regular", size: 40))
+                            .foregroundStyle(.white)
+                            .padding(.top, -45)
+                    }.padding(.bottom, 120)
+                    
+                    Spacer()
+                    MetelykxView().padding(.bottom, 10)
+                }
             }
         }
     }
 }
-
 //-MARK: struct Metelykx
 struct MetelykxView: View {
     var body: some View {
