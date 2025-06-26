@@ -5,8 +5,8 @@
 //  Created by Denis Ivaschenko on 25.06.2025.
 //
 
-import Foundation
 import SwiftUI
+import Foundation
 
 enum RoadType: String, CaseIterable, Identifiable {
     case asphalt = "Асфальт"
