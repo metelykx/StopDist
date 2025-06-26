@@ -5,7 +5,6 @@
 //  Created by Denis Ivaschenko on 25.06.2025.
 //
 
-import Foundation
 import SwiftUI
 
 class AppSettings: ObservableObject {
