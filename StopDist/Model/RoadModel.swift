@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Foundation
 
 enum RoadType: String, CaseIterable, Identifiable {
     case asphalt = "Асфальт"

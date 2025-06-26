@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftUI
 
 struct Calculation: Identifiable {
     let id = UUID()
