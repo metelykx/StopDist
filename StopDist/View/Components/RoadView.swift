@@ -1,10 +1,3 @@
-//
-//  RoadView.swift
-//  StopDist
-//
-//  Created by Denis Ivaschenko on 25.06.2025.
-//
-
 import SwiftUI
 
 struct RoadView: View {
@@ -16,13 +9,18 @@ struct RoadView: View {
                 .frame(width: length, height: 20)
                 .foregroundColor(.gray.opacity(0.3))
             
-            HStack(spacing: 30) {
-                ForEach(0..<Int(length / 40), id: \.self) { _ in
-                    Rectangle()
-                        .frame(width: 20, height: 4)
-                        .foregroundColor(.white)
+            // Оптимизированная разметка
+            Path { path in
+                let segmentLength: CGFloat = 50
+                let segments = Int(length / segmentLength)
+                
+                for i in 0..<segments {
+                    let x = CGFloat(i) * segmentLength + 15
+                    path.move(to: CGPoint(x: x, y: 10))
+                    path.addLine(to: CGPoint(x: x + 20, y: 10))
                 }
             }
+            .stroke(Color.white, lineWidth: 4)
         }
     }
 }

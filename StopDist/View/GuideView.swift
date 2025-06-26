@@ -1,10 +1,3 @@
-//
-//  GuideView.swift
-//  StopDist
-//
-//  Created by Denis Ivaschenko on 25.06.2025.
-//
-
 import SwiftUI
 
 struct GuideView: View {

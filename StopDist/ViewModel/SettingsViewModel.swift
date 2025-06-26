@@ -1,10 +1,3 @@
-//
-//  SettingsViewModel.swift
-//  StopDist
-//
-//  Created by Denis Ivaschenko on 25.06.2025.
-//
-
 import SwiftUI
 
 class SettingsViewModel: ObservableObject {
@@ -14,6 +7,13 @@ class SettingsViewModel: ObservableObject {
     @Published var unitSystem: Int
     
     init(settings: AppSettings) {
+        self.isAdvancedMode = settings.isAdvancedMode
+        self.defaultSpeed = settings.defaultSpeed
+        self.defaultRoadType = settings.defaultRoadType
+        self.unitSystem = settings.unitSystem
+    }
+    
+    func updateSettings(from settings: AppSettings) {
         self.isAdvancedMode = settings.isAdvancedMode
         self.defaultSpeed = settings.defaultSpeed
         self.defaultRoadType = settings.defaultRoadType

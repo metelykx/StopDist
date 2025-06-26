@@ -1,34 +1,31 @@
-//
-//  StopDistApp.swift
-//  StopDist
-//
-//  Created by Denis Ivaschenko on 20.06.2025.
-//
-
 import SwiftUI
 
 @main
 struct StopDistApp: App {
+    // Создаем экземпляр настроек приложения
+    @StateObject private var appSettings = AppSettings()
     
-    //create variables in order to monitor changes in the lifecycle of the mobile application
+    // Переменные для отслеживания жизненного цикла приложения
     @Environment(\.scenePhase) var scenePhase
-    
-    //to track what to show
     @State var isAppActive: Bool = true
+    
     var body: some Scene {
         WindowGroup {
             ZStack {
-                
-                //add Views
+                // Главный экран приложения
                 ContentView()
-                    .opacity(isAppActive ? 1:0)
+                    .opacity(isAppActive ? 1 : 0)
                     .animation(.default, value: isAppActive)
+                    // Передаем настройки в иерархию представлений
+                    .environmentObject(appSettings)
                 
+                // Стартовый экран (возможно, заставка)
                 StartView()
-                    .opacity(isAppActive ? 0:1)
+                    .opacity(isAppActive ? 0 : 1)
                     .animation(.default, value: isAppActive)
             }
-        }.onChange(of: scenePhase) { newValue in
+        }
+        .onChange(of: scenePhase) { newValue in
             switch newValue {
             case .active:
                 self.isAppActive = true

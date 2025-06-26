@@ -1,13 +1,13 @@
 //
-//  ContentViewModel.swift
+//  CalculationViewModel.swift
 //  StopDist
 //
-//  Created by Denis Ivaschenko on 25.06.2025.
+//  Created by Denis Ivaschenko on 26.06.2025.
 //
 
 import SwiftUI
 
-class ContentViewModel: ObservableObject {
+class CalculationViewModel: ObservableObject {
     // Основные параметры
     @Published var speed: Double = 60
     @Published var roadType: RoadType = .asphalt
@@ -39,36 +39,16 @@ class ContentViewModel: ObservableObject {
     // История расчетов
     @Published var calculationHistory: [Calculation] = []
     
-    // Фазы анимации
-    enum AnimationPhase {
-        case ready, accelerating, cruising, braking, stopped
-    }
-    @Published var animationPhase: AnimationPhase = .ready
-    @Published var carPosition: CGFloat = 0
-    @Published var roadOffset: CGFloat = 0
+    // Кеши для оптимизации
+    private var frictionCache: Double?
+    private var distanceCache: Double?
+    private let screenWidth = UIScreen.main.bounds.width
     
-    var buttonText: String {
-        switch animationPhase {
-        case .ready: return "Запустить симуляцию"
-        case .accelerating: return "Разгон..."
-        case .cruising: return "Движение..."
-        case .braking: return "Торможение..."
-        case .stopped: return "Завершено"
-        }
-    }
-    
-    var displayBrakingDistance: CGFloat {
-        min(CGFloat(brakingDistance) * 5, UIScreen.main.bounds.width * 2)
-    }
-    
-    var totalRoadLength: CGFloat {
-        UIScreen.main.bounds.width + displayBrakingDistance + 100
-    }
-    
-    var cruisingDuration: Double { Double(300 / speed) }
-    var brakingDuration: Double { Double(brakingDistance) * 0.02 }
-    
+    // Вычисляемые свойства с кешированием
     var adjustedFriction: Double {
+        if let cached = frictionCache { return cached }
+        
+        // Оптимизированные вычисления
         let baseFriction: Double = {
             switch roadType {
             case .asphalt: return 0.7
@@ -97,15 +77,10 @@ class ContentViewModel: ObservableObject {
         }()
         
         let tireMultiplier: Double = {
-            switch tireType {
-            case .summer:
+            if tireType == .summer {
                 return (roadType == .snow || roadType == .ice) ? 0.6 : 1.0
-            case .winter:
-                var multiplier = 1.2
-                if hasSpikes {
-                    multiplier *= (roadType == .ice) ? 1.4 : 1.1
-                }
-                return multiplier
+            } else {
+                return hasSpikes ? (roadType == .ice ? 1.54 : 1.32) : 1.2
             }
         }()
         
@@ -113,11 +88,16 @@ class ContentViewModel: ObservableObject {
         let temperatureFactor = 1.0 - abs(temperature - 20) * 0.005
         let moistureFactor = 1.0 - surfaceMoisture * 0.002
         
-        return baseFriction * weatherMultiplier * roadConditionMultiplier *
+        let result = baseFriction * weatherMultiplier * roadConditionMultiplier *
                tireMultiplier * spoilerMultiplier * temperatureFactor * moistureFactor
+        
+        frictionCache = result
+        return result
     }
     
     var brakingDistance: Double {
+        if let cached = distanceCache { return cached }
+        
         let speedInMetersPerSecond = speed / 3.6
         var baseDistance = pow(speedInMetersPerSecond, 2) / (2 * adjustedFriction * 9.81)
         
@@ -171,17 +151,18 @@ class ContentViewModel: ObservableObject {
         }()
         
         let treadFactor: Double = {
-            switch treadDepth {
-            case 8.0...: return 1.0
-            case 6.0..<8.0: return 0.95
-            case 4.0..<6.0: return 0.85
-            case 2.0..<4.0: return 0.7
-            default: return 0.6
-            }
+            if treadDepth >= 8.0 { return 1.0 }
+            else if treadDepth >= 6.0 { return 0.95 }
+            else if treadDepth >= 4.0 { return 0.85 }
+            else if treadDepth >= 2.0 { return 0.7 }
+            else { return 0.6 }
         }()
         
-        return baseDistance * loadFactor * slopeFactor * pressureFactor *
+        let result = baseDistance * loadFactor * slopeFactor * pressureFactor *
                brakeEfficiency * safetyFactor * treadFactor
+        
+        distanceCache = result
+        return result
     }
     
     func saveCalculation() {
@@ -201,35 +182,8 @@ class ContentViewModel: ObservableObject {
         calculationHistory.insert(newCalc, at: 0)
     }
     
-    func startAnimation() {
-        animationPhase = .accelerating
-        carPosition = -UIScreen.main.bounds.width / 2 + 50
-        roadOffset = 0
-        
-        withAnimation(.easeIn(duration: 1)) {
-            carPosition = 0
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.animationPhase = .cruising
-            withAnimation(.linear(duration: self.cruisingDuration)) {
-                self.carPosition = UIScreen.main.bounds.width / 2 - 30
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + self.cruisingDuration) {
-                self.animationPhase = .braking
-                withAnimation(.easeOut(duration: self.brakingDuration)) {
-                    self.carPosition += self.displayBrakingDistance
-                    self.roadOffset = -self.displayBrakingDistance
-                }
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + self.brakingDuration) {
-                    self.animationPhase = .stopped
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        self.animationPhase = .ready
-                    }
-                }
-            }
-        }
+    func clearCache() {
+        frictionCache = nil
+        distanceCache = nil
     }
 }

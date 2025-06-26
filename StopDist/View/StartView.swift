@@ -9,6 +9,9 @@ import SwiftUI
 
 //-MARK: struct StartView
 struct StartView: View {
+    
+    @EnvironmentObject var appSettings: AppSettings
+    
     var body: some View {
         GeometryReader { geometry in
             

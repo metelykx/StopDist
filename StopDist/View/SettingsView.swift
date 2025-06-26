@@ -1,10 +1,3 @@
-//
-//  SettingsView.swift
-//  StopDist
-//
-//  Created by Denis Ivaschenko on 25.06.2025.
-//
-
 import SwiftUI
 
 struct SettingsView: View {
@@ -12,7 +5,9 @@ struct SettingsView: View {
     @StateObject private var viewModel: SettingsViewModel
     
     init() {
-        _viewModel = StateObject(wrappedValue: SettingsViewModel(settings: AppSettings()))
+        // Используем временные настройки для инициализации
+        let tempSettings = AppSettings()
+        _viewModel = StateObject(wrappedValue: SettingsViewModel(settings: tempSettings))
     }
     
     var body: some View {
@@ -52,7 +47,12 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Настройки")
+            .onAppear {
+                // Обновляем ViewModel реальными настройками при появлении
+                viewModel.updateSettings(from: appSettings)
+            }
             .onDisappear {
+                // Сохраняем настройки при закрытии
                 viewModel.saveSettings(to: appSettings)
             }
         }

@@ -17,4 +17,8 @@ class HistoryViewModel: ObservableObject {
     func deleteItems(at offsets: IndexSet) {
         history.remove(atOffsets: offsets)
     }
+    
+    func clearHistory() {
+        history.removeAll()
+    }
 }
