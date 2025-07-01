@@ -42,8 +42,7 @@ struct SettingsView: View {
                             .foregroundColor(.secondary)
                     }
                     
-                    Link("Политика конфиденциальности", destination: URL(string: "https://example.com/privacy")!)
-                    Link("Связаться с поддержкой", destination: URL(string: "https://example.com/support")!)
+                    Link("Связаться с поддержкой", destination: URL(string: "https://t.me/metelykx")!)
                 }
             }
             .navigationTitle("Настройки")

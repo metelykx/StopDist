@@ -5,6 +5,16 @@ struct ContentView: View {
     @StateObject private var animationVM = AnimationViewModel()
     @State private var selectedTab = 0
     
+    
+    private var buttonBackground: Color {
+            switch animationVM.animationPhase {
+            case .ready, .stopped:
+                return Color.blue
+            default:
+                return Color.gray
+            }
+        }
+    
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationView {
@@ -48,6 +58,14 @@ struct SimulationView: View {
     @ObservedObject var calculationVM: CalculationViewModel
     @ObservedObject var animationVM: AnimationViewModel
     
+    private var buttonBackground: Color {
+            switch animationVM.animationPhase {
+            case .ready, .stopped:
+                return Color.blue
+            default:
+                return Color.gray
+            }
+        }
     var body: some View {
         Form {
             Section(header: Text("Основные параметры")) {
@@ -214,40 +232,29 @@ struct SimulationView: View {
                 .padding(.vertical, 8)
             }
             
-            Section {
-                Button(action: {
-                    animationVM.startAnimation(calculationVM: calculationVM)
-                }) {
-                    HStack {
-                        Image(systemName: "car.fill")
-                        Text(animationVM.buttonText)
-                            .font(.headline)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(animationVM.animationPhase == .ready ? Color.blue : Color.gray)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
+            Button(action: {
+                animationVM.startAnimation(calculationVM: calculationVM)
+            }) {
+                HStack {
+                    Image(systemName: "car.fill")
+                    Text(animationVM.buttonText)
+                        .font(.headline)
                 }
-                .disabled(animationVM.animationPhase != .ready)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(buttonBackground)
+                .foregroundColor(.white)
+                .cornerRadius(12)
             }
+            .disabled(animationVM.animationPhase == .accelerating || animationVM.animationPhase == .braking)
+
+            
             
             Section(header: Text("Анимация торможения")) {
-                ZStack(alignment: .leading) {
-                    RoadView(length: animationVM.totalRoadLength(for: calculationVM.brakingDistance))
-                        .offset(x: animationVM.roadOffset)
-                    
-                    if animationVM.animationPhase == .braking {
-                        BrakingZoneView(width: animationVM.displayBrakingDistance(for: calculationVM.brakingDistance))
-                            .offset(x: UIScreen.main.bounds.width / 2 - 30)
-                    }
-                    
-                    CarView(tireType: calculationVM.tireType)
-                        .offset(x: animationVM.carPosition)
-                        .drawingGroup() // Ускорение рендеринга
-                }
-                .frame(height: 120)
-                .padding(.vertical)
+                BrakingAnimationView(
+                    calculationVM: calculationVM,
+                    animationVM: animationVM
+                )
             }
             
             Section {
@@ -266,4 +273,45 @@ struct SimulationView: View {
             }
         }
     }
+    
 }
+
+struct DistanceScaleView: View {
+    var brakingDistance: Double
+    var visible: Bool
+    
+   
+    
+    var body: some View {
+        HStack {
+            Text("0 м")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+            
+            Spacer()
+            
+            if visible {
+                Text("\(brakingDistance, specifier: "%.1f") м")
+                    .font(.caption)
+                    .foregroundColor(.red)
+                    .padding(5)
+                    .background(Color.red.opacity(0.2))
+                    .cornerRadius(5)
+            }
+            
+            Spacer()
+            
+            Text("100 м")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+        }
+        .padding(.horizontal, 20)
+        .opacity(visible ? 1 : 0)
+        .animation(.easeInOut, value: visible)
+        
+       
+    }
+    
+}
+
+
