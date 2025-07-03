@@ -1,24 +1,24 @@
-//
-//  HistoryViewModel.swift
-//  StopDist
-//
-//  Created by Denis Ivaschenko on 25.06.2025.
-//
-
 import Foundation
+import Combine
 
 class HistoryViewModel: ObservableObject {
-    @Published var history: [Calculation]
+    private let storage = HistoryStorage.shared
+    private var cancellables = Set<AnyCancellable>()
     
-    init(history: [Calculation]) {
-        self.history = history
+    @Published var history: [Calculation] = []
+    
+    init() {
+        storage.$history
+            .receive(on: RunLoop.main)
+            .assign(to: \.history, on: self)
+            .store(in: &cancellables)
     }
     
     func deleteItems(at offsets: IndexSet) {
-        history.remove(atOffsets: offsets)
+        storage.delete(at: offsets)
     }
     
     func clearHistory() {
-        history.removeAll()
+        storage.clear()
     }
 }

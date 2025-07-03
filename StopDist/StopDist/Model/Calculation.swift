@@ -4,10 +4,9 @@
 //
 //  Created by Denis Ivaschenko on 25.06.2025.
 //
-
 import Foundation
 
-struct Calculation: Identifiable {
+struct Calculation: Identifiable, Codable {
     let id = UUID()
     let speed: Double
     let roadType: String

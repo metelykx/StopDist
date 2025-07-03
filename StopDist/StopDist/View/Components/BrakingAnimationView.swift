@@ -1,94 +1,53 @@
 import SwiftUI
 
 struct BrakingAnimationView: View {
-    var calculationVM: CalculationViewModel
+    @ObservedObject var calculationVM: CalculationViewModel
     @ObservedObject var animationVM: AnimationViewModel
-    
-    // Локальные переменные для упрощения доступа
-    private var brakingDistance: Double {
-        calculationVM.brakingDistance
-    }
-    
-    private var displayBrakingDistance: CGFloat {
-        animationVM.displayBrakingDistance(for: brakingDistance)
-    }
-    
-    private var centerX: CGFloat {
-        UIScreen.main.bounds.width / 2
-    }
     
     var body: some View {
         VStack {
-            // Индикатор состояния
-            HStack {
-                Spacer()
-                Text(animationVM.animationPhase == .stopped ?
-                     "Остановлено" : animationVM.buttonText)
-                    .font(.headline)
-                    .foregroundColor(animationVM.animationPhase == .braking ? .red : .primary)
-                Spacer()
-            }
-            .padding(.bottom, 5)
-            
-            // Контейнер анимации
-            ZStack {
-                // Фон для контраста
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.gray.opacity(0.1))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray, lineWidth: 1)
-                    )
-                
-                // Центральная линия (для ориентации)
-                Rectangle()
-                    .frame(width: 2, height: 100)
-                    .foregroundColor(.blue.opacity(0.3))
-                    .position(x: centerX, y: 50)
-                
-                // Дорожное полотно
-                RoadView()
-                    .frame(height: 20)
-                    .padding(.horizontal, 20)
-                
-                // Зона торможения (всегда в центре)
-                if animationVM.brakingZoneVisible {
-                    BrakingZoneView(width: displayBrakingDistance)
-                        .position(x: centerX, y: 50)
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    // Дорога
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.3))
+                        .frame(height: 40)
+                    
+                    // Начало торможения
+                    Rectangle()
+                        .fill(Color.gray)
+                        .frame(width: 2)
+                        .offset(x: geometry.size.width * 0.4)
+                    
+                    // Тормозной путь
+                    if animationVM.brakingZoneVisible {
+                        let startX = geometry.size.width * 0.4
+                        let brakingWidth = min(
+                            CGFloat(calculationVM.brakingDistance) * geometry.size.width / 100,
+                            geometry.size.width * 0.6
+                        )
+                        
+                        Rectangle()
+                            .fill(Color.red.opacity(0.3))
+                            .frame(width: brakingWidth)
+                            .offset(x: startX)
+                    }
+                    
+                    // Машинка
+                    Image(systemName: "car.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 60, height: 30)
+                        .offset(x: geometry.size.width * animationVM.carProgress - 30)
+                        .foregroundColor(.blue)
                 }
-                
-                // Машина
-                CarView(tireType: calculationVM.tireType)
-                    .position(x: animationVM.carPosition, y: 50)
             }
             .frame(height: 100)
             
-            // Шкала расстояния
-            if animationVM.brakingZoneVisible || animationVM.animationPhase == .stopped {
-                HStack {
-                    Text("0 м")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    Text("\(brakingDistance, specifier: "%.1f") м")
-                        .font(.caption)
-                        .foregroundColor(.red)
-                        .padding(5)
-                        .background(Color.red.opacity(0.2))
-                        .cornerRadius(5)
-                    
-                    Spacer()
-                    
-                    Text("100 м")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.horizontal, 30)
-                .padding(.top, 5)
-            }
+            DistanceScaleView(
+                brakingDistance: calculationVM.brakingDistance,
+                visible: animationVM.brakingZoneVisible
+            )
         }
-        .padding(.vertical, 10)
     }
 }

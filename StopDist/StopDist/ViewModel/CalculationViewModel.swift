@@ -1,54 +1,50 @@
-//
-//  CalculationViewModel.swift
-//  StopDist
-//
-//  Created by Denis Ivaschenko on 26.06.2025.
-//
-
 import SwiftUI
 
 class CalculationViewModel: ObservableObject {
-    // Основные параметры
+    // MARK: - Параметры автомобиля
     @Published var speed: Double = 60
     @Published var roadType: RoadType = .asphalt
     @Published var weather: WeatherCondition = .dry
     @Published var roadCondition: RoadCondition = .normal
     @Published var hasSpoiler: Bool = false
     
-    // Резина и тормоза
+    // MARK: - Параметры резины и тормозов
     @Published var tireType: TireType = .summer
     @Published var hasSpikes: Bool = false
     @Published var absStatus: ABSStatus = .withABS
     @Published var brakeCondition: BrakeCondition = .new
     
-    // Состояние автомобиля
+    // MARK: - Состояние автомобиля
     @Published var vehicleLoad: VehicleLoad = .medium
     @Published var roadSlope: RoadSlope = .flat
     @Published var tirePressure: TirePressure = .optimal
     @Published var treadDepth: Double = 8.0
     
-    // Системы безопасности
+    // MARK: - Системы безопасности
     @Published var hasEBD: Bool = true
     @Published var hasBA: Bool = true
     @Published var hasESP: Bool = true
     
-    // Температура и влажность
+    // MARK: - Параметры окружающей среды
     @Published var temperature: Double = 20.0
     @Published var surfaceMoisture: Double = 30.0
     
-    // История расчетов
-    @Published var calculationHistory: [Calculation] = []
+    // MARK: - История расчетов
+    private let storage = HistoryStorage.shared
     
-    // Кеши для оптимизации
+    var calculationHistory: [Calculation] {
+        storage.history
+    }
+    
+    // MARK: - Кеши для оптимизации
     private var frictionCache: Double?
     private var distanceCache: Double?
-    private let screenWidth = UIScreen.main.bounds.width
     
-    // Вычисляемые свойства с кешированием
+    // MARK: - Вычисляемые свойства
     var adjustedFriction: Double {
         if let cached = frictionCache { return cached }
         
-        // Оптимизированные вычисления
+        // Базовый коэффициент трения
         let baseFriction: Double = {
             switch roadType {
             case .asphalt: return 0.7
@@ -59,6 +55,7 @@ class CalculationViewModel: ObservableObject {
             }
         }()
         
+        // Модификаторы условий
         let weatherMultiplier: Double = {
             switch weather {
             case .dry: return 1.0
@@ -84,10 +81,12 @@ class CalculationViewModel: ObservableObject {
             }
         }()
         
+        // Дополнительные факторы
         let spoilerMultiplier = hasSpoiler ? 1.05 : 1.0
         let temperatureFactor = 1.0 - abs(temperature - 20) * 0.005
         let moistureFactor = 1.0 - surfaceMoisture * 0.002
         
+        // Итоговый коэффициент трения
         let result = baseFriction * weatherMultiplier * roadConditionMultiplier *
                tireMultiplier * spoilerMultiplier * temperatureFactor * moistureFactor
         
@@ -98,9 +97,11 @@ class CalculationViewModel: ObservableObject {
     var brakingDistance: Double {
         if let cached = distanceCache { return cached }
         
+        // Базовый расчет дистанции
         let speedInMetersPerSecond = speed / 3.6
         var baseDistance = pow(speedInMetersPerSecond, 2) / (2 * adjustedFriction * 9.81)
         
+        // Влияние ABS
         switch absStatus {
         case .withABS:
             baseDistance *= 0.85
@@ -110,6 +111,7 @@ class CalculationViewModel: ObservableObject {
             }
         }
         
+        // Дополнительные факторы
         let loadFactor: Double = {
             switch vehicleLoad {
             case .empty: return 1.0
@@ -158,6 +160,7 @@ class CalculationViewModel: ObservableObject {
             else { return 0.6 }
         }()
         
+        // Итоговая дистанция торможения
         let result = baseDistance * loadFactor * slopeFactor * pressureFactor *
                brakeEfficiency * safetyFactor * treadFactor
         
@@ -165,6 +168,7 @@ class CalculationViewModel: ObservableObject {
         return result
     }
     
+    // MARK: - Действия
     func saveCalculation() {
         let newCalc = Calculation(
             speed: speed,
@@ -179,7 +183,7 @@ class CalculationViewModel: ObservableObject {
             distance: brakingDistance,
             date: Date()
         )
-        calculationHistory.insert(newCalc, at: 0)
+        storage.add(newCalc)
     }
     
     func clearCache() {
@@ -187,3 +191,5 @@ class CalculationViewModel: ObservableObject {
         distanceCache = nil
     }
 }
+
+

@@ -6,11 +6,11 @@ class AnimationViewModel: ObservableObject {
     }
     
     @Published var animationPhase: AnimationPhase = .ready
-    @Published var carPosition: CGFloat = 0
+    @Published var carProgress: CGFloat = 0
     @Published var brakingZoneVisible = false
+    @Published var isAnimating = false
     
-    private var isActive = true
-    private let screenWidth = UIScreen.main.bounds.width
+    private var animationTask: DispatchWorkItem?
     
     var buttonText: String {
         switch animationPhase {
@@ -21,69 +21,78 @@ class AnimationViewModel: ObservableObject {
         }
     }
     
-    func displayBrakingDistance(for distance: Double) -> CGFloat {
-        min(CGFloat(distance) * 8, screenWidth * 0.8)
-    }
-    
-    func totalRoadLength(for distance: Double) -> CGFloat {
-        screenWidth * 1.5
-    }
-    
     func startAnimation(calculationVM: CalculationViewModel) {
-        // Разрешаем запуск из состояний ready и stopped
-        guard isActive && (animationPhase == .ready || animationPhase == .stopped) else { return }
+        guard !isAnimating else { return }
         
         resetState()
+        isAnimating = true
         animationPhase = .accelerating
         brakingZoneVisible = false
         
-        // Начальная позиция машины (слева от экрана)
-        carPosition = -100
+        // Отменяем предыдущие задачи анимации
+        animationTask?.cancel()
         
-        // Позиция в центре экрана
-        let centerX = screenWidth / 2
-        
-        // Фаза разгона до центра экрана
+        // Анимация разгона
         withAnimation(.easeIn(duration: 1.5)) {
-            self.carPosition = centerX - 30
+            self.carProgress = 0.4
         }
         
-        // Переход к торможению
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-            guard let self = self, self.isActive else { return }
+        // Создаем задачу для торможения
+        let brakingTask = DispatchWorkItem { [weak self] in
+            guard let self = self, self.isAnimating else { return }
             
             self.animationPhase = .braking
             self.brakingZoneVisible = true
             
-            let brakingDuration = Double(calculationVM.brakingDistance) * 0.04
-            let brakingDistance = self.displayBrakingDistance(for: calculationVM.brakingDistance)
+            // Рассчитываем длительность торможения пропорционально пути
+            let brakingDuration = Double(calculationVM.brakingDistance) * 0.02
             
-            // Торможение в центре экрана
+            // Анимация торможения
             withAnimation(.easeOut(duration: brakingDuration)) {
-                self.carPosition = centerX - 30 + brakingDistance
+                // Рассчитываем конечную позицию с учетом масштабирования
+                let maxProgress = min(0.4 + 0.6 * (calculationVM.brakingDistance / 100), 1.0)
+                self.carProgress = maxProgress
             }
             
-            // Завершение анимации
-            DispatchQueue.main.asyncAfter(deadline: .now() + brakingDuration) { [weak self] in
-                guard let self = self, self.isActive else { return }
+            // Задача для завершения анимации
+            let stopTask = DispatchWorkItem { [weak self] in
+                guard let self = self, self.isAnimating else { return }
                 self.animationPhase = .stopped
+                self.isAnimating = false
             }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + brakingDuration, execute: stopTask)
+            self.animationTask = stopTask
         }
-    }
-    
-    func resetState() {
-        animationPhase = .ready
-        carPosition = -100
-        brakingZoneVisible = false
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: brakingTask)
+        animationTask = brakingTask
     }
     
     func stopAnimation() {
-        isActive = false
-        animationPhase = .stopped
+        // Отменяем все запланированные анимации
+        animationTask?.cancel()
+        
+        // Возвращаем машинку в начальное положение с анимацией
+        withAnimation(.easeOut(duration: 0.5)) {
+            self.carProgress = 0
+            self.brakingZoneVisible = false
+        }
+        
+        // Устанавливаем состояние
+        isAnimating = false
+        animationPhase = .ready
+    }
+    
+    func resetState() {
+        // Без анимации - мгновенный сброс
+        carProgress = 0
+        brakingZoneVisible = false
+        animationPhase = .ready
     }
     
     func reset() {
-        isActive = true
+        isAnimating = false
         resetState()
     }
 }
